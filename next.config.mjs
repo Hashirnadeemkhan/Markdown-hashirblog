@@ -1,10 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true, // Ensure strict mode is enabled
-  swcMinify: true,       // Use SWC for minification
+  // Increase the memory limit for the build process
   experimental: {
-    appDir: true,        // Enable experimental features if you're using the app directory
+    largePageDataBytes: 128 * 1000, // 128KB
   },
+  // Disable static exports if you're not using them
+  output: 'standalone',
 };
 
 export default nextConfig;
+
