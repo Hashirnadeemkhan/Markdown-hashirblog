@@ -1,4 +1,5 @@
 import fs from "fs"
+import path from "path"  // Import 'path' module to handle file paths correctly
 import matter from "gray-matter"
 import { notFound } from "next/navigation"
 import rehypeDocument from 'rehype-document'
@@ -6,7 +7,7 @@ import rehypeFormat from 'rehype-format'
 import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
-import {unified} from 'unified'
+import { unified } from 'unified'
 import rehypePrettyCode from "rehype-pretty-code"
 import { transformerCopyButton } from '@rehype-pretty/transformers'
 import OnThisPage from "@/components/onthispage"
@@ -19,9 +20,11 @@ interface PageProps {
   params: { slug: string }
 }
 
+// Generate metadata for the page
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const filepath = `src/content/${params.slug}.md`
-  
+  // Use process.cwd() to resolve paths correctly in production
+  const filepath = path.join(process.cwd(), 'src/content', `${params.slug}.md`)
+
   if (!fs.existsSync(filepath)) {
     return {
       title: 'Not Found',
@@ -38,22 +41,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
+// Page function to render the content
 export default async function Page({ params }: PageProps) {
-  const filepath = `src/content/${params.slug}.md`
+  // Use process.cwd() to resolve paths correctly in production
+  const filepath = path.join(process.cwd(), 'src/content', `${params.slug}.md`)
 
   if (!fs.existsSync(filepath)) {
-    notFound()
+    notFound() // This will trigger a 404 if the file doesn't exist
   }
 
   const fileContent = fs.readFileSync(filepath, "utf-8")
-  const {content, data} = matter(fileContent)
+  const { content, data } = matter(fileContent)
 
   const processor = unified()
     .use(remarkParse)
     .use(remarkRehype)
-    .use(rehypeDocument, {title: '👋🌍'})
+    .use(rehypeDocument, { title: '👋🌍' })
     .use(rehypeFormat)
-    .use(rehypeStringify) 
+    .use(rehypeStringify)
     .use(rehypeSlug)
     .use(rehypeAutolinkHeadings)
     .use(rehypePrettyCode, {
@@ -77,9 +82,8 @@ export default async function Page({ params }: PageProps) {
         <p className="text-sm text-gray-500 mb-4">{data.date}</p>
       </div>
       <div dangerouslySetInnerHTML={{ __html: htmlContent.toString() }} className="prose dark:prose-invert" />
-      <OnThisPage htmlContent={htmlContent.toString()}/>
-      <CommentsSection/>
+      <OnThisPage htmlContent={htmlContent.toString()} />
+      <CommentsSection />
     </div>
   )
 }
-
