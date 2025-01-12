@@ -1,7 +1,10 @@
-// import { NextConfig } from "next";
-
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  reactStrictMode: true, // Ensure strict mode is enabled
+  swcMinify: true,       // Use SWC for minification
+  experimental: {
+    appDir: true,        // Enable experimental features if you're using the app directory
+  },
 };
 
 export default nextConfig;
